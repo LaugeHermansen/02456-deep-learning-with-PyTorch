@@ -145,8 +145,8 @@ class NeuralNetwork:
 
 ###################################################
 
-X = np.load("1_Feedforward_Pen_and_Paper/X.npy", allow_pickle=True)
-y = np.load("1_Feedforward_Pen_and_Paper/y.npy", allow_pickle=True)
+X = np.load("1_Feedforward_Pen_and_Paper/data/X.npy", allow_pickle=True)
+y = np.load("1_Feedforward_Pen_and_Paper/data/y.npy", allow_pickle=True)
 
 
 X_train, X_test, y_train, y_test = train_test_split(X,y,test_size = 0.5)
