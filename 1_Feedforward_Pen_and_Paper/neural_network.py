@@ -28,6 +28,13 @@ class Tanh(NNActivationFunction):
         return 1-np.tanh(x)**2
 
 
+class ReLU(NNActivationFunction):
+    def __init__(self):
+        self.ReLU = np.vectorize(lambda x: max(x,0))
+    def forward(self, x):
+        return self.ReLU(x)
+    def backward(self,x):
+        float(x>0)
 
 class NeuralNetwork:
     def __init__(self, type, layer_dimensions: Tuple, activation_function: NNActivationFunction, learning_rate):
