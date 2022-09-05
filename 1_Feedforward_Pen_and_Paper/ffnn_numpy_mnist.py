@@ -8,11 +8,18 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 
-os.chdir("C:/Users/Bruger/Documents/02456-deep-learning-with-PyTorch")
+try:
+    os.chdir("C:/Users/Bruger/Documents/02456-deep-learning-with-PyTorch")
+except:
+    try:
+        os.chdir("D:/DTU/02456-deep-learning-with-PyTorch")
+    except:
+        raise FileNotFoundError("Couldn't find directory")
+        
 
 NeuralNetwork = importlib.import_module('neural_network').NeuralNetwork
 Tanh = importlib.import_module('neural_network').Tanh
-# ReLU = importlib.import_module('neural_network').ReLU
+ReLU = importlib.import_module('neural_network').ReLU
 
 print("Loading and ecoding data ... ")
 
@@ -36,10 +43,15 @@ print("Initializing and training network")
 
 
 # net = NeuralNetwork("classification", (D,300,70,20,15,12,n_classes), Tanh(), 5e-1)
+net = NeuralNetwork("classification", (D,400,200,100,50,25,17,15,13,11, n_classes), Tanh(), 3e-1)
 
-# net = NeuralNetwork("classification", (D,300,70,20,15,12,n_classes), Tanh(), 5e-1)
-net = NeuralNetwork("classification", (D,300,70,20,15,12,n_classes), ReLU(), 5e-1)
-net.train(X_train, X_test, y_train, y_test, n_epochs = 10000, n_prints = None, stochastic = 0.1, batch_size = 200, goal_accuracy = 1.)
+
+# net = NeuralNetwork("classification", (D,300,70,20,15,12,n_classes), ReLU(), 1e-5)
+# net = NeuralNetwork("classification", (D,300,70,20,15,12,n_classes), ReLU(), 5e-1)
+
+
+net.train(X_train, X_test, y_train, y_test, n_epochs = 10000, n_prints = None, stochastic = 0.15, batch_size = 2000, goal_accuracy = 1.)
 
 #  stochastic = 0.5, n_prints = None, batch_size = 100, goal_accuracy = 0.95
 
+# https://fb.watch/flUMgUbycO/
