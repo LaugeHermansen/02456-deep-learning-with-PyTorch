@@ -1,3 +1,4 @@
+from lib2to3.pgen2 import grammar
 from typing import Tuple
 import numpy as np
 
@@ -34,7 +35,7 @@ class ReLU(NNActivationFunction):
     def forward(self, x):
         return self.ReLU(x)
     def backward(self,x):
-        float(x>0)
+        return (x>0).astype(float)
 
 class NeuralNetwork:
     def __init__(self, type, layer_dimensions: Tuple, activation_function: NNActivationFunction, learning_rate):
@@ -79,10 +80,12 @@ class NeuralNetwork:
 
         # set L and init weights
         self.L = len(self.layer_dimensions)-1
-        self.weights = [np.empty((1,1))] + [np.random.rand(layer_dimensions[i], layer_dimensions[i+1])-0.5 for i in range(self.L)]
+        self.weights = [np.empty((1,1))] + [(np.random.rand(layer_dimensions[i], layer_dimensions[i+1])-0.5)*0.5 for i in range(self.L)]
         
         # helper: iterator over layers (1,2,3, ... ,L)
         self.layer_iter = lambda: range(1,self.L + 1)
+
+        self.n_parameters = sum([layer_dimensions[l-1]*layer_dimensions[l] for l in self.layer_iter()])
 
         #init empty z and a.
         self.z = []
@@ -135,7 +138,7 @@ class NeuralNetwork:
         if len(X.shape) != 2:
             raise ValueError(f'X must be a matrix of shape (NxD), where D is input dimensionality - was shape {X.shape}')
         if X.shape[1] != self.layer_dimensions[0]:
-            raise ValueError(f'Input dimensionality of X doesn\' match input dimensionality of network - was shape {X.shape}')
+            raise ValueError(f'Input dimensionality of X doesn\'t match input dimensionality of network - was shape {X.shape}')
         
         # init empty list of z and a. 
         # a[l][j] is the linear combination of naurons in layer l-1 with the according weights
@@ -310,8 +313,15 @@ class NeuralNetwork:
                     i += batch_size
                 
                 test_accuracy = batch_corrects/N_test
+
+                # weight_change_step_l2_norm = sum([np.sum(gradient[l]**2) for l in self.layer_iter()])**0.5*self.learning_rate/N_train
+		
+                avg_weight_change = sum([np.sum(np.abs(gradient[l])) for l in self.layer_iter()])*self.learning_rate/N_train/self.n_parameters 
+                avg_weight        = sum([np.sum(np.abs(self.weights[l])) for l in self.layer_iter()])/self.n_parameters 
+		
+
                 # print status
-                print("epoch:", epoch, (6-len(str(epoch)))*" ", f"train acc: {train_accuracy:.3f}   test acc: {test_accuracy:.3f}")
+                print("epoch:", epoch, (6-len(str(epoch)))*" ", f"train acc: {train_accuracy:.3f}   test acc: {test_accuracy:.3f}   step size: {avg_weight_change:.3}  avg weight: {avg_weight:.3}")
 
                 # break if reached the goal accuracy
                 if test_accuracy >= goal_accuracy: break
