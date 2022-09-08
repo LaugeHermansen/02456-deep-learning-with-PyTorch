@@ -43,14 +43,14 @@ print("Initializing and training network")
 
 
 # net = NeuralNetwork("classification", (D,300,70,20,15,12,n_classes), Tanh(), 5e-1)
-net = NeuralNetwork("classification", (D,400,200,100,50,25,17,15,13,11, n_classes), Tanh(), 3e-1)
+net = NeuralNetwork("classification", (D,400,200,100,50,25,17,15,13,11, n_classes), Tanh(), 3e-1) #93%
 
 
 # net = NeuralNetwork("classification", (D,300,70,20,15,12,n_classes), ReLU(), 1e-5)
 # net = NeuralNetwork("classification", (D,300,70,20,15,12,n_classes), ReLU(), 5e-1)
 
 
-net.train(X_train, X_test, y_train, y_test, n_epochs = 10000, n_prints = None, stochastic = 0.15, batch_size = 2000, goal_accuracy = 1.)
+net.train(X_train, X_test, y_train, y_test, n_epochs = 10000, n_prints = None, stochastic = 0.15, batch_size = 1000, goal_accuracy = 1.)
 
 #  stochastic = 0.5, n_prints = None, batch_size = 100, goal_accuracy = 0.95
 
