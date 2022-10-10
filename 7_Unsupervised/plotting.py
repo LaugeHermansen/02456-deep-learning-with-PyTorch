@@ -104,7 +104,7 @@ def plot_samples(ax, x):
     ax.axis('off')
 
 
-def plot_interpolations(ax, vae):
+def plot_interpolations(ax, vae, plot_mean=False):
     device = next(iter(vae.parameters())).device
     nrow = 10
     nsteps = 10
@@ -115,7 +115,8 @@ def plot_interpolations(ax, vae):
     t = torch.linspace(0, 1, 10, device=device)
     zs = t[None, :, None] * z[:, 0, None, :] + (1 - t[None, :, None]) * z[:, 1, None, :]
     px = vae.observation_model(zs.view(nrow * nsteps, -1))
-    x = px.sample()
+    if plot_mean: x = px.mean
+    else:         x = px.sample()
     x = x.to('cpu')
     x_grid = make_grid(x.view(-1, 1, 28, 28), nrow=nrow).permute(1, 2, 0)
     ax.imshow(x_grid)
@@ -174,8 +175,8 @@ def plot_latents(ax, z, y):
     ax.scatter(z[:, 0], z[:, 1], color=colors)
 
 
-def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="tmp_vae_out.png", figsize=(18, 18)):
-    fig, axes = plt.subplots(3, 3, figsize=figsize, squeeze=False)
+def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="tmp_vae_out.png", figsize=(18, 18), plot_mean=False):
+    fig, axes = plt.subplots(3, 3, figsize=figsize, squeeze=False,)
 
     # plot the observation
     axes[0, 0].set_title(r'Observation $\mathbf{x}$')
@@ -199,7 +200,8 @@ def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="
     axes[0, 2].set_title(
         r'Reconstruction $\mathbf{x} \sim p_\theta(\mathbf{x} | \mathbf{z}), \mathbf{z} \sim q_\phi(\mathbf{z} | \mathbf{x})$')
     px = outputs['px']
-    x_sample = px.sample().to('cpu')
+    if plot_mean: x_sample = px.mean.to('cpu')
+    else:         x_sample = px.sample().to('cpu')
     plot_samples(axes[0, 2], x_sample)
 
     # plot ELBO
@@ -226,13 +228,15 @@ def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="
     # plot prior samples
     axes[2, 0].set_title(r'Samples $\mathbf{x} \sim p_\theta(\mathbf{x} | \mathbf{z}), \mathbf{z} \sim p(\mathbf{z})$')
     px = vae.sample_from_prior(batch_size=x.size(0))['px']
-    x_samples = px.sample()
+    if plot_mean: x_samples = px.mean.to('cpu')
+    else:         x_samples = px.sample().to('cpu')
+
     plot_samples(axes[2, 0], x_samples)
 
     # plot interpolations samples
     axes[2, 1].set_title(
         r'Latent Interpolations: $\mathbf{x} \sim p_\theta(\mathbf{x} | t \cdot \mathbf{z}_1 + (1-t) \cdot \mathbf{z}_2), \mathbf{z}_1, \mathbf{z}_2 \sim p(\mathbf{z}), t=0 \dots 1$')
-    plot_interpolations(axes[2, 1], vae)
+    plot_interpolations(axes[2, 1], vae, plot_mean)
 
     # plot samples (sampling from a grid instead of the prior)
     if vae.latent_features == 2:
