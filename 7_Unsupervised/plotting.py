@@ -172,15 +172,20 @@ def plot_latents(ax, z, y):
     palette = sns.color_palette()
     colors = [palette[l] for l in y]
     z = TSNE(n_components=2).fit_transform(z)
-    ax.scatter(z[:, 0], z[:, 1], color=colors)
+    # scatter = ax.scatter(z[:, 0], z[:, 1], color=colors)
+    for label in y.unique():
+        scatter = ax.scatter(z[y==label, 0], z[y==label, 1], color=palette[label], label=int(label))
+    ax.legend()
 
 
-def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="tmp_vae_out.png", figsize=(18, 18), plot_mean=False):
+def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="tmp_vae_out.png", figsize=(18, 18), plot_mean=False, n_samples_to_plot = 100):
+    if n_samples_to_plot == None: n_samples_to_plot = x.size(0)
     fig, axes = plt.subplots(3, 3, figsize=figsize, squeeze=False,)
 
     # plot the observation
     axes[0, 0].set_title(r'Observation $\mathbf{x}$')
-    plot_samples(axes[0, 0], x)
+    # plot_samples(axes[0, 0], x)
+    plot_samples(axes[0, 0], x[:n_samples_to_plot])
 
     # plot the latent samples
     try:
@@ -202,7 +207,7 @@ def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="
     px = outputs['px']
     if plot_mean: x_sample = px.mean.to('cpu')
     else:         x_sample = px.sample().to('cpu')
-    plot_samples(axes[0, 2], x_sample)
+    plot_samples(axes[0, 2], x_sample[:n_samples_to_plot])
 
     # plot ELBO
     ax = axes[1, 0]
@@ -231,7 +236,7 @@ def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="
     if plot_mean: x_samples = px.mean.to('cpu')
     else:         x_samples = px.sample().to('cpu')
 
-    plot_samples(axes[2, 0], x_samples)
+    plot_samples(axes[2, 0], x_samples[:n_samples_to_plot])
 
     # plot interpolations samples
     axes[2, 1].set_title(
