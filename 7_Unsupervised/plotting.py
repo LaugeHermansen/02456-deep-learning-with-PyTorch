@@ -151,7 +151,7 @@ def plot_2d_latents(ax, qz, z, y):
 
     # plot data points
     mus, sigmas = qz.mu.to('cpu'), qz.sigma.to('cpu')
-    mus = [mus[i].numpy().tolist() for i in range(batch_size)]
+    mus = [mus[i].detach().numpy().tolist() for i in range(batch_size)]
     sigmas = [sigmas[i].numpy().tolist() for i in range(batch_size)]
 
     posteriors = [
@@ -168,17 +168,17 @@ def plot_2d_latents(ax, qz, z, y):
 
 
 def plot_latents(ax, z, y):
-    z = z.to('cpu')
+    z = z.to('cpu').detach()
     palette = sns.color_palette()
     colors = [palette[l] for l in y]
     z = TSNE(n_components=2).fit_transform(z)
     # scatter = ax.scatter(z[:, 0], z[:, 1], color=colors)
-    for label in y.unique():
+    for label in y.detach().unique():
         scatter = ax.scatter(z[y==label, 0], z[y==label, 1], color=palette[label], label=int(label))
     ax.legend()
 
 
-def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="tmp_vae_out.png", figsize=(18, 18), plot_mean=False, n_samples_to_plot = 100):
+def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="tmp_vae_out.png", figsize=(18, 18), plot_mean=False, n_samples_to_plot = 100, clear=True):
     if n_samples_to_plot == None: n_samples_to_plot = x.size(0)
     fig, axes = plt.subplots(3, 3, figsize=figsize, squeeze=False,)
 
@@ -256,6 +256,7 @@ def make_vae_plots(vae, x, y, outputs, training_data, validation_data, tmp_img="
     plt.savefig(tmp_img)
     plt.close(fig)
     display(Image(filename=tmp_img))
-    clear_output(wait=True)
-
-    os.remove(tmp_img)
+    
+    if clear:
+        clear_output(wait=True)
+        os.remove(tmp_img)
