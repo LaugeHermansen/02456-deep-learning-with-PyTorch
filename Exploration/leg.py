@@ -222,38 +222,71 @@ for exp in range(n_experiments):
         
 
 
-#%%
+# #%%
 
-for model in models:
-    plt.plot(model.log_data['train_step_step'], model.log_data['train_loss_step'], label="train_loss")
-    plt.plot(model.log_data['val_step_step'], model.log_data['val_loss_step'], label="val_loss")
-    plt.legend()
-    plt.show()
-    plt.plot(model.log_data['train_step_step'], model.log_data['train_acc_step'], label="train_acc")
-    plt.plot(model.log_data['val_step_step'], model.log_data['val_acc_step'], label="val_acc")
-    plt.legend()
-    plt.show()
+# for model in models:
+#     plt.plot(model.log_data['train_step_step'], model.log_data['train_loss_step'], label="train_loss")
+#     plt.plot(model.log_data['val_step_step'], model.log_data['val_loss_step'], label="val_loss")
+#     plt.legend()
+#     plt.show()
+#     plt.plot(model.log_data['train_step_step'], model.log_data['train_acc_step'], label="train_acc")
+#     plt.plot(model.log_data['val_step_step'], model.log_data['val_acc_step'], label="val_acc")
+#     plt.legend()
+#     plt.show()
 
 
-#%%
+# #%%
 
-all_params = np.concatenate([model.log_data['params'] for model in models], axis=0)
+# all_params = np.concatenate([model.log_data['params'] for model in models[-6:]], axis=0)
 
-sc = StandardScaler(with_mean=False)
-all_params_sc = sc.fit_transform(all_params)
+# sc = StandardScaler(with_mean=False)
+# all_params_sc = sc.fit_transform(all_params)
 
-pca = PCA(n_components=10)
-pca.fit(all_params_sc)
+# pca = PCA(n_components=10)
+# pca.fit(all_params_sc)
 
-#%%
+# #%%
 
-for model in models:
-    params = model.log_data['params']
-    params_tr = pca.transform(sc.transform(params))
-    plt.scatter(params_tr[:,0], params_tr[:,1], c=model.log_data['val_acc_step'], cmap='viridis')
-    plt.plot(params_tr[:,0], params_tr[:,1], c='k', alpha=1, linewidth = 0.5)
-plt.colorbar()
-plt.show()
-plt.plot(np.cumsum(pca.explained_variance_ratio_))
+# for model in models[-6:]:
+#     params = model.log_data['params']
+#     params_tr = pca.transform(sc.transform(params))
+#     plt.scatter(params_tr[:,0], params_tr[:,1], c=model.log_data['val_acc_step'], cmap='viridis', s=1)
+#     plt.plot(params_tr[:,0], params_tr[:,1], c='k', alpha=1, linewidth = 0.5)
+#     plt.plot(params_tr[-1,0], params_tr[-1,1], c='r', marker='o')
+# plt.colorbar()
+# # plt.show()
+# # plt.plot(np.cumsum(pca.explained_variance_ratio_))
 
-#%%
+# #%%
+
+
+# model_avg = Model(**model_params)
+
+# for i in range(len(model_avg.module_list)):
+#     if isinstance(model_avg.module_list[i], nn.BatchNorm2d) or isinstance(model_avg.module_list[i], nn.BatchNorm1d):
+#         model_avg.module_list[i].running_mean.data = torch.mean(torch.stack([model.module_list[i].running_mean.data for model in models[-30:]]), dim=0)
+#         model_avg.module_list[i].running_var.data = torch.mean(torch.stack([model.module_list[i].running_var.data for model in models[-30:]]), dim=0)
+#     if isinstance(model_avg.module_list[i], nn.Conv2d) or isinstance(model_avg.module_list[i], nn.Linear) or isinstance(model_avg.module_list[i], nn.BatchNorm2d) or isinstance(model_avg.module_list[i], nn.BatchNorm1d):
+#         model_avg.module_list[i].weight.data = torch.mean(torch.stack([model.module_list[i].weight.data for model in models[-30:]]), dim=0)
+#         model_avg.module_list[i].bias.data = torch.mean(torch.stack([model.module_list[i].bias.data for model in models[-30:]]), dim=0)
+
+
+# model_avg.to(device)
+
+# acc = 0
+# loss = 0
+
+# for X,y in data_val_epoch_loader:
+#     y_pred = model_avg(X)
+#     acc += model_avg.accuracy(X, y, False)
+#     loss += model_avg.loss_fn(y_pred, y).item()
+
+# acc /= len(data_val_epoch)
+# loss /= len(data_val_epoch)
+
+# print(f"Accuracy: {acc}")
+# print(f"Loss: {loss}")
+
+
+
+
